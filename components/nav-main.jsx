@@ -23,7 +23,7 @@ export function NavMain({
 }) {
   return (
     (<SidebarGroup>
-      <SidebarGroupLabel>Platform</SidebarGroupLabel>
+      <SidebarGroupLabel>Dashoard</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
           <Collapsible
