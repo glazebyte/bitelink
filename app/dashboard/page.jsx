@@ -11,6 +11,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar"
 import { LinkTable } from "./link-table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import LinkForm from "@/components/linkform";
 export default function Page() {
   return (
     <>
@@ -60,8 +61,7 @@ export function LinkModal() {
         <DialogHeader>
           <DialogTitle>Add Link</DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete your account
-            and remove your data from our servers.
+            <LinkForm/>
           </DialogDescription>
         </DialogHeader>
       </DialogContent>

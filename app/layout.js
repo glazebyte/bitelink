@@ -3,6 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "../components/theme-provider";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
+import { Toaster } from "sonner";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -32,7 +33,8 @@ export default function RootLayout({ children }) {
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
-        >       
+        >
+          <Toaster />     
           {children}
         </ThemeProvider>
       </body>

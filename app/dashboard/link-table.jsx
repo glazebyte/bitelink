@@ -15,70 +15,67 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import Link from "next/link";
+import { useState, useEffect } from "react"
+import useSWR from "swr";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
+
+const fetcher = (...args) => fetch(...args).then((res) => res.json())
 
 export const columns = [
     {
-        accessorKey: "no",
+        accessorKey: "id",
         header: "No",
     },
     {
         accessorKey: "url",
         header: "URL",
         cell: props => (
-            <Link href={props.getValue()}>{props.getValue()}</Link>
-          ),
+            <Link href={'https://'+props.getValue()}>{props.getValue()}</Link>
+        ),
     },
     {
         accessorKey: "shortlink",
         header: "Short Link",
         cell: props => (
-            <Link href={props.getValue()}>{props.getValue()}</Link>
-          ),
+            <Link  href={'https://'+props.getValue()}>{props.getValue()}</Link>
+        ),
     },
     {
-        accessorKey: "qrcode",
-        header: "QR Code",
-    },
-]
-const data = [
-    {
-        no: 1,
-        url: "youtube.com",
-        shortlink: "bite.ninjabytes.net",
-        qrcode: "."
+        accessorKey: "createdAt",
+        header: "Created at",
+        cell: (props) => {
+            const rawDate = new Date(props.getValue())
+            const date = rawDate.toLocaleDateString()
+            return <span>{date}</span>;
+        },
     },
     {
-        no: 1,
-        url: "youtube.com",
-        shortlink: "bite.ninjabytes.net",
-        qrcode: "."
-    },
-    {
-        no: 1,
-        url: "youtube.com",
-        shortlink: "bite.ninjabytes.net",
-        qrcode: "."
-    },
-    {
-        no: 1,
-        url: "youtube.com",
-        shortlink: "bite.ninjabytes.net",
-        qrcode: "."
-    },
-    {
-        no: 1,
-        url: "youtube.com",
-        shortlink: "bite.ninjabytes.net",
-        qrcode: "."
+        accessorKey: "id",
+        header: "Delete",
+        cell: props => (
+            <Button variant='outline' onClick={() => handleDelete(props.getValue())}><Trash2/></Button>
+        ),
     },
 ]
 
 export function LinkTable() {
+    const { data, error, isLoading } = useSWR("/api/shortlinks", fetcher);
+
     const table = useReactTable({
-        data,
+        data: data?.data || [], // Selalu pastikan data ada (gunakan array kosong jika undefined)
         columns,
         getCoreRowModel: getCoreRowModel(),
-    })
+    });
+
+    // Handle loading and error states
+    if (isLoading) return <p>Loading...</p>;
+    if (error) return <p>Error loading data</p>;
+    if (!data || !data.data || !data.data.length) {
+        return <p>No data available</p>;
+    }
+
 
     return (
         <div className="rounded-md border">
@@ -127,3 +124,24 @@ export function LinkTable() {
         </div>
     )
 }
+
+export const handleDelete = async (id) => {
+    try {
+      const response = await fetch(`/api/shortlinks/${id}`, {
+        method: 'DELETE',
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        toast.success(result.message);
+        // Setelah data berhasil dihapus, refresh data dengan mutate
+        mutate();
+      } else {
+        toast.error(result.message || "Failed to delete the link");
+      }
+    } catch (error) {
+      console.error("Error deleting link:", error);
+      toast.error("An error occurred while deleting the link");
+    }
+  };
