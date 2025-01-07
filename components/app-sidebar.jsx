@@ -2,20 +2,15 @@
 
 import * as React from "react"
 import {
-  AudioWaveform,
-  BookOpen,
-  Bot,
-  Command,
-  Frame,
+  FileText,
   GalleryVerticalEnd,
-  Map,
-  PieChart,
+  HomeIcon,
+  Link,
+  ScanQrCode,
   Settings2,
-  SquareTerminal,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
-import { NavUser } from "@/components/nav-user"
 import { TeamSwitcher } from "@/components/team-switcher"
 import {
   Sidebar,
@@ -24,6 +19,8 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
+import { NavSecondary } from "./nav-secondary"
+import { NavUser } from "./nav-user"
 
 // This is sample data.
 const data = {
@@ -41,43 +38,33 @@ const data = {
   ],
   navMain: [
     {
-      title: "Main",
+      title: "Home",
       url: "#",
-      icon: SquareTerminal,
       isActive: true,
-      items: [
-        {
-          title: "Home",
-          url: "/dashboard",
-        },
-        {
-          title: "Manage Shortlink",
-          url: "/dashboard/link",
-        },
-      ],
+      icon: HomeIcon,
     },
+    {
+      title: "Shortlink",
+      url: "#",
+      icon: Link,
+    },
+    {
+      title: "Qr Code",
+      url: "#",
+      icon: ScanQrCode,
+    },
+    {
+      title: "Pages",
+      url: "#",
+      icon: FileText,
+      badge: "Coming soon",
+    },
+  ],
+  navSecondary: [
     {
       title: "Settings",
       url: "#",
       icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
     },
   ],
 }
@@ -86,17 +73,18 @@ export function AppSidebar({
   ...props
 }) {
   return (
-    (<Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="icon" className="border-r-0" {...props}>
       <SidebarHeader>
         <TeamSwitcher teams={data.teams} />
+        <NavMain items={data.navMain} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavSecondary items={data.navSecondary} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
       </SidebarFooter>
       <SidebarRail />
-    </Sidebar>)
-  );
+    </Sidebar>
+  )
 }
