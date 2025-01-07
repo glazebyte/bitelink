@@ -1,13 +1,14 @@
-"use client"
+"use client";
 
 import {
   SidebarMenu,
   SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
+import { Badge } from "./ui/badge";
 
-export function NavMain({items}) {
+export function NavMain({ items }) {
   return (
     <SidebarMenu>
       {items.map((item) => (
@@ -18,9 +19,15 @@ export function NavMain({items}) {
               <span>{item.title}</span>
             </a>
           </SidebarMenuButton>
-          <SidebarMenuBadge>{item.badge}</SidebarMenuBadge>
+          <SidebarMenuBadge>
+            {item.badge && (
+              <Badge variant="outline" className="mr-2">
+                {item.badge}
+              </Badge>
+            )}
+          </SidebarMenuBadge>
         </SidebarMenuItem>
       ))}
     </SidebarMenu>
-  )
+  );
 }
