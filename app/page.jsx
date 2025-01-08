@@ -8,7 +8,6 @@ import LoginDialog from "@/components/login-dialog";
 import { getProviders } from "next-auth/react";
 
 export default async function Home() {
-  const loginproviders = await getProviders();
   return (
     <>
       <Navbar />

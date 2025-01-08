@@ -39,18 +39,18 @@ const data = {
   navMain: [
     {
       title: "Home",
-      url: "#",
+      url: "/dashboard",
       isActive: true,
       icon: HomeIcon,
     },
     {
       title: "Shortlink",
-      url: "#",
+      url: "/dashboard/links",
       icon: Link,
     },
     {
       title: "Qr Code",
-      url: "#",
+      url: "/dashboard/qrcodes",
       icon: ScanQrCode,
     },
     {
