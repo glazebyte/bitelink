@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState ,useEffect} from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,15 +9,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { signIn } from "next-auth/react";
+import { getProviders, signIn } from "next-auth/react";
 import github from "@/app/assets/Icon/github.svg";
 import google from "@/app/assets/Icon/google.svg";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Github } from "lucide-react";
+import { LoginForm } from "./login-form";
+import { effect } from "zod";
 
-function LoginDialog({ loginproviders }) {
-  console.log(loginproviders);
+async function LoginDialog() {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -25,12 +26,12 @@ function LoginDialog({ loginproviders }) {
           Get started for free
         </button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="text-center text-xl">Login</DialogTitle>
           <DialogDescription>
             <div className="flex flex-col gap-6">
-              
+              <LoginForm/>
             </div>
           </DialogDescription>
         </DialogHeader>
