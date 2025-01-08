@@ -8,23 +8,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { getProviders, signIn } from "next-auth/react";
-import github from "@/app/assets/Icon/github.svg";
-import google from "@/app/assets/Icon/google.svg";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Github } from "lucide-react";
 import { LoginForm } from "./login-form";
-import { effect } from "zod";
 
-async function LoginDialog() {
+async function LoginDialog({children}) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <button className="px-8 py-4 text-lg font-medium text-center text-white bg-indigo-600 rounded-md">
-          Get started for free
-        </button>
+        {children}
       </DialogTrigger>
       <DialogContent className="max-w-md">
         <DialogHeader>
