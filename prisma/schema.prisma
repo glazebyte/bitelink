@@ -13,9 +13,77 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Account {
+  id                 String    @id @default(cuid())
+  userId             String
+  providerType       String
+  providerId         String
+  providerAccountId  String
+  refreshToken       String?
+  accessToken        String?
+  accessTokenExpires DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  user               User      @relation(fields: [userId], references: [id])
+
+  @@unique([providerId, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  expires      DateTime
+  sessionToken String   @unique
+  accessToken  String   @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  links         Link[]   // Relasi ke tabel Link
+  accounts      Account[]
+  sessions      Session[]
+}
+
+model VerificationRequest {
+  id         String   @id @default(cuid())
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([identifier, token])
+}
+
 model Link {
+  id          Int      @id @default(autoincrement())
+  userId      String?     // Optional jika tidak ada user terkait
+  originalUrl String   @db.Text
+  shortUrl    String   @unique @db.VarChar(50)
+  clicks      Int      @default(0)
+  isPrivate   Boolean  @default(false) // Menentukan apakah link privat atau publik
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  clicksData  Click[]  // Relasi ke tabel Click
+}
+
+model Click {
   id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  url       String   @unique
-  shortlink String   @unique
+  linkId    Int
+  clickedAt DateTime @default(now())
+  ipAddress String?  @db.VarChar(45)
+  userAgent String?  @db.Text
+  referrer  String?  @db.Text
+  location  String?  @db.VarChar(255)
+  link      Link     @relation(fields: [linkId], references: [id], onDelete: Cascade)
 }
