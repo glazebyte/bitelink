@@ -45,7 +45,7 @@ const data = {
     },
     {
       title: "Shortlink",
-      url: "/dashboard/links",
+      url: "/dashboard/shortlinks",
       icon: Link,
     },
     {
