@@ -49,8 +49,8 @@ const data = {
       icon: Link,
     },
     {
-      title: "Qr Code",
-      url: "/dashboard/qrcodes",
+      title: "Analytics",
+      url: "/dashboard/analytics",
       icon: ScanQrCode,
     },
     {
