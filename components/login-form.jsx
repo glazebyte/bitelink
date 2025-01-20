@@ -3,8 +3,10 @@ import { Button } from "@/components/ui/button";
 import { signIn } from "next-auth/react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export function LoginForm() {
+  const callbackUrl = useSearchParams().get("callbackUrl");
   return (
     <div className="grid gap-6">
       <div className="flex flex-col gap-4">

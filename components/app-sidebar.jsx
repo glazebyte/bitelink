@@ -21,14 +21,10 @@ import {
 } from "@/components/ui/sidebar"
 import { NavSecondary } from "./nav-secondary"
 import { NavUser } from "./nav-user"
+import { useSession } from "next-auth/react"
 
 // This is sample data.
 const data = {
-  user: {
-    name: "Zaky Ahmad Fauzi",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   teams: [
     {
       name: "Default",
@@ -72,6 +68,7 @@ const data = {
 export function AppSidebar({
   ...props
 }) {
+  const {data: session} = useSession();
   return (
     <Sidebar collapsible="icon" className="border-r-0" {...props}>
       <SidebarHeader>
@@ -82,7 +79,7 @@ export function AppSidebar({
         <NavSecondary items={data.navSecondary} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={session.user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
