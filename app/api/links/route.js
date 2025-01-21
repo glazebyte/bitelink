@@ -1,24 +1,45 @@
+export const dynamic = "force-dynamic";
 import { PrismaClient } from "@prisma/client";
+import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 export async function GET() {
-  const links = await prisma.link.findMany()
-  return NextResponse.json({
-    success : true,
-    messeage : "data delivered",
-    data : links
-  },{
-    status : 200
-  })
+  const sesssion = await getServerSession();
+  const links = await prisma.link.findMany({
+    where: {
+      userId: sesssion.user.id,
+    },
+  });
+  const linksdata = links.map((link) => ({
+    id: link.id,
+    originalUrl: link.originalUrl,
+    shortUrl: `${process.env.SHORTLINK_BASE_URL}/${link.shortUrl}`,
+    clicks: link.clicks,
+    isPrivate: link.isPrivate,
+    createdAt: link.createdAt,
+    updatedAt: link.updatedAt,
+  }));
+  return NextResponse.json(
+    {
+      success: true,
+      message: "data delivered",
+      data: {
+        links: linksdata,
+        },
+    },
+    {
+      status: 200,
+    }
+  );
 }
-
 
 /**
  * POST: Create a new link
  */
 export async function POST(request) {
+  const sesssion = await getServerSession();
   const formData = await request.formData();
   const url = formData.get("url");
   const shortlink = formData.get("shortlink");

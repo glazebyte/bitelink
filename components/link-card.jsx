@@ -29,6 +29,8 @@ import { DialogTitle } from "@radix-ui/react-dialog";
 import QRCode from "react-qr-code";
 
 function LinkCard({ data }) {
+  data.createdAt = new Date(data.createdAt).toDateString();
+  data.updatedAt = new Date(data.updatedAt).toDateString();
   const copyToClipboard = () => {
     navigator.clipboard.writeText(data.shortUrl);
   }
@@ -37,7 +39,7 @@ function LinkCard({ data }) {
       <CardHeader className="flex flex-row">
         <div className="w-2/3">
           <CardTitle>
-            <a href={data.shorturl}>{data.shortUrl}</a>
+            <Link href={data.shortUrl}>{data.shortUrl}</Link>
           </CardTitle>
           <CardDescription>
             <Link className="text-blue-600" href={data.originalUrl}>
@@ -52,10 +54,6 @@ function LinkCard({ data }) {
             Share
           </Button>
           <LinkEditor/>
-          {/* <Button variant="outline" className="h-8 rounded-md px-2">
-            <Pencil />
-            Edit
-          </Button> */}
         </div>
       </CardHeader>
       <CardFooter className="py-3 border-t justify-between">

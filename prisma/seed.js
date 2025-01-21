@@ -1,54 +1,48 @@
-// prisma/seed.js
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient } = require("@prisma/client");
+const fs = require("fs");
+const path = require("path");
 const prisma = new PrismaClient();
 
-async function main() {
-  // Membuat user
-  const user = await prisma.user.findUnique({
-    where: {
-      email: 'zakyfauzi44@gmail.com',
-  }})
+// Function to seed the database
+async function seed() {
+  const args = process.argv.slice(2); // Get arguments passed to the script
+  if (args.length === 0) {
+    console.log("Please provide a SQL file to seed.");
+    process.exit(1);
+  }
+  const transaction = await prisma.$transaction([]);
 
-//   console.log('Created user:', user);
+  try {
+    for (const arg of args) {
+      const filePath = path.resolve(__dirname, "seed", arg);
+      if (fs.existsSync(filePath)) {
+        console.log(typeof filePath);
+        // Execute the SQL file within the transaction
+        // console.log("Seeding SQL file:", filePath);
+        const sql = fs.readFileSync(filePath, "utf-8");
+        await prisma.$executeRawUnsafe(sql); // Executes raw SQL
+        console.log(`Successfully executed SQL from ${filePath}`);
+      } else {
+        console.log(`File not found: ${filePath}`);
+      }
+    }
 
-//   // Membuat akun untuk user
-//   const account = await prisma.account.create({
-//     data: {
-//       userId: user.id,
-//       providerType: 'google',
-//       providerId: 'google',
-//       providerAccountId: '104700041455836832552',
-//       accessToken: 'sample-access-token',
-//     },
-//   });
+    // If all seed files are successful, commit the transaction
+    await prisma.$transaction(transaction);
+    console.log("Seeding completed successfully.");
+  } catch (error) {
+    // If any error occurs, the transaction will be rolled back automatically
+    console.error("Seeding failed. Rolling back transaction.");
+    console.log(error);
+    process.exit(1);
+  } finally {
+    await prisma.$disconnect(); // Disconnect Prisma client
+  }
 
-//   console.log('Created account:', account);
-
-  // Menambahkan banyak link untuk user
-  const linksData = [
-    { originalUrl: 'https://example1.com', shortUrl: 'ex1', isPrivate: false },
-    { originalUrl: 'https://example2.com', shortUrl: 'ex2', isPrivate: false },
-    { originalUrl: 'https://example3.com', shortUrl: 'ex3', isPrivate: true },
-    { originalUrl: 'https://example4.com', shortUrl: 'ex4', isPrivate: false },
-    { originalUrl: 'https://example5.com', shortUrl: 'ex5', isPrivate: true },
-  ];
-
-  const links = await prisma.link.createMany({
-    data: linksData.map(link => ({
-      userId: user.id,  // Pastikan setiap link terkait dengan user
-      originalUrl: link.originalUrl,
-      shortUrl: link.shortUrl,
-      isPrivate: link.isPrivate,
-    })),
-  });
-
-  console.log(`Created ${links.count} links.`);
+  await prisma.$disconnect(); // Disconnect Prisma client
 }
 
-main()
-  .catch(e => {
-    throw e
-  })
-  .finally(async () => {
-    await prisma.$disconnect()
-  });
+seed().catch((error) => {
+  console.error("Seeding failed:", error);
+  process.exit(1);
+});
