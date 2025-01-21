@@ -4,9 +4,13 @@ import NextAuth from "next-auth";
 import GithubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 
-const prisma = new PrismaClient;
+const prisma = new PrismaClient();
 export const authOptions = {
-  adapter : PrismaAdapter(prisma),
+  adapter: PrismaAdapter(prisma),
+  secret: process.env.NEXTAUTH_SECRET,
+  session: {
+    strategy: "jwt",
+  },
   // Configure one or more authentication providers
   providers: [
     GoogleProvider({
@@ -22,6 +26,22 @@ export const authOptions = {
   pages: {
     signIn: "/auth/signin",
     // signOut: "/auth/signout",
+  },
+  callbacks: {
+    async jwt({ token, user }) {
+      // console.log("JWT Callback", token, user);
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      // console.log("Session Callback", session, token);
+      if (token) {
+        session.user.id = token.id;
+      }
+      return session;
+    },
   },
 };
 export const handler = NextAuth(authOptions);

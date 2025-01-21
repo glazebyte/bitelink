@@ -28,7 +28,7 @@ export function LoginForm() {
         <Button
           variant="outline"
           className="w-full"
-          onClick={() => signIn("google")}
+          onClick={() => signIn("google",{callbackUrl:callbackUrl})}
         >
           <svg
             role="img"

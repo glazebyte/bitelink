@@ -39,14 +39,14 @@ function DashboardHeader() {
           <BreadcrumbList>
             {breadcrumbs &&
               breadcrumbs.map((breadcrumb, index) => (
-                <>
-                  <BreadcrumbItem key={index}>
+                <React.Fragment key={breadcrumb.url}>
+                  <BreadcrumbItem key={breadcrumb.url}>
                     <BreadcrumbLink href={breadcrumb.url}>
                       {breadcrumb.part}
                     </BreadcrumbLink>
                   </BreadcrumbItem>
-                  {index !== breadcrumbs.length - 1 && <BreadcrumbSeparator />}
-                </>
+                  {index !== breadcrumbs.length - 1 && <BreadcrumbSeparator makan={`separator-${index}`} key={`${breadcrumb.url}-separator`}/>}
+                </React.Fragment>
               ))}
           </BreadcrumbList>
         </Breadcrumb>

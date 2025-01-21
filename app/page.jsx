@@ -5,7 +5,6 @@ import { CheckBadgeIcon } from "@heroicons/react/24/outline";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import LoginDialog from "@/components/login-dialog";
-import { getProviders } from "next-auth/react";
 
 export default async function Home() {
   return (
@@ -30,14 +29,6 @@ export default async function Home() {
                     Get started for free
                   </button>
                 </LoginDialog>
-                {/* <a
-                  href="https://web3templates.com/templates/nextly-landing-page-template-for-startups"
-                  target="_blank"
-                  rel="noopener"
-                  className="px-8 py-4 text-lg font-medium text-center text-white bg-indigo-600 rounded-md "
-                >
-                  Get started for free
-                </a> */}
                 <a
                   href="https://github.com/web3templates/nextly-template/"
                   target="_blank"
