@@ -2,11 +2,12 @@ export const dynamic = "force-dynamic";
 import { PrismaClient } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
+import { authOptions } from "../auth/[...nextauth]/route";
 
 const prisma = new PrismaClient();
 
 export async function GET() {
-  const sesssion = await getServerSession();
+  const sesssion = await getServerSession(authOptions);
   const links = await prisma.link.findMany({
     where: {
       userId: sesssion.user.id,
@@ -16,7 +17,6 @@ export async function GET() {
     id: link.id,
     originalUrl: link.originalUrl,
     shortUrl: `${process.env.SHORTLINK_BASE_URL}/${link.shortUrl}`,
-    clicks: link.clicks,
     isPrivate: link.isPrivate,
     createdAt: link.createdAt,
     updatedAt: link.updatedAt,
@@ -25,9 +25,7 @@ export async function GET() {
     {
       success: true,
       message: "data delivered",
-      data: {
-        links: linksdata,
-        },
+      data: linksdata
     },
     {
       status: 200,
