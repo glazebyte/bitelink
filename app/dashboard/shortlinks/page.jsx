@@ -5,13 +5,6 @@ import { Input } from "@/components/ui/input";
 import LinkList from "./link-list";
 
 function Page() {
-  // const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-  // const response = await fetch(`${baseUrl}/api/links`,{cache:'reload'});
-  // const linksData = await response.json().then((res) => res.data);
-  // console.log(linksData);
-    // .then((res) => res.json())
-    // .then((data) => data.data);
-  // console.log(linksData);
   return (
     <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min p-4">
       <div className="flex justify-between">

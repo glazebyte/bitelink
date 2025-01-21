@@ -25,6 +25,7 @@ export default function LinkList() {
 
   useEffect(() => {
     fetchLinks();
+    fetchLinks();
   }, []);
 
   if (loading) {
