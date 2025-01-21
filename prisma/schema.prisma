@@ -14,35 +14,35 @@ datasource db {
 }
 
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String  @map("user_id")
-  type               String
-  provider           String
-  providerAccountId  String  @map("provider_account_id")
-  refresh_token      String? @db.Text
-  access_token       String? @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String? @db.Text
-  session_state      String?
- 
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
- 
+
   @@unique([provider, providerAccountId])
   @@map("accounts")
 }
- 
+
 model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique @map("session_token")
   userId       String   @map("user_id")
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
- 
+
   @@map("sessions")
 }
- 
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -52,30 +52,29 @@ model User {
   accounts      Account[]
   sessions      Session[]
   link          Link[]
- 
+
   @@map("users")
 }
- 
+
 model VerificationToken {
   identifier String
   token      String
   expires    DateTime
- 
+
   @@unique([identifier, token])
   @@map("verification_tokens")
 }
 
 model Link {
   id          Int      @id @default(autoincrement())
-  userId      String?     // Optional jika tidak ada user terkait
+  userId      String? // Optional jika tidak ada user terkait
   originalUrl String   @db.Text
   shortUrl    String   @unique @db.VarChar(50)
-  clicks      Int      @default(0)
   isPrivate   Boolean  @default(false) // Menentukan apakah link privat atau publik
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  clicksData  Click[]  // Relasi ke tabel Click
+  clicksData  Click[] // Relasi ke tabel Click
 }
 
 model Click {
@@ -86,5 +85,6 @@ model Click {
   userAgent String?  @db.Text
   referrer  String?  @db.Text
   location  String?  @db.VarChar(255)
+  useqr     Boolean  @default(false) @db.TinyInt()
   link      Link     @relation(fields: [linkId], references: [id], onDelete: Cascade)
 }
