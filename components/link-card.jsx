@@ -79,6 +79,7 @@ function LinkCard({ data }) {
 }
 
 function QrModal({ url }) {
+  url = `${url}?qr=true`;
   return (
     <Dialog>
       <DialogTrigger asChild>
