@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useEffect, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -50,6 +51,40 @@ const topLinks = [
 ];
 
 function Page() {
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+  const [data, setData] = useState({
+    overview: null,
+    topLinks: null,
+    clicks: null,
+    devices: null,
+    referrers: null,
+  });
+  const [isLoading, setLoading] = useState(true);
+
+  async function fetchData() {
+    try {
+      const endpoints = ["overview", "browsers", "clicks", "devices","refferers", "top_links",];
+      const responses = await Promise.all(
+        endpoints.map((endpoint) => fetch(`${BASE_URL}/api/analytics/${endpoint}`).then((res) => res.json()))
+      );
+
+      setData({
+        overview: responses[0].data,
+        browsers: responses[1].data,
+        clicks: responses[2].data,
+        devices: responses[3].data,
+        referrers: responses[4].data,
+        topLinks: responses[5].data,
+      })
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+  useEffect(() => {
+    fetchData();
+  },[]);
   return (
     <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min p-4">
       <div className="space-y-6">
@@ -174,6 +209,45 @@ function Page() {
                 </CardContent>
               </Card>
             </div>
+            <Card>
+              <CardHeader>
+                <CardTitle>Top Referrers</CardTitle>
+                <CardDescription>
+                  Sources driving the most traffic to your links
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {[
+                    { name: "Twitter", percentage: 30, color: "#1DA1F2" },
+                    { name: "Facebook", percentage: 25, color: "#4267B2" },
+                    { name: "Direct", percentage: 20, color: "#4CAF50" },
+                    { name: "LinkedIn", percentage: 15, color: "#0077B5" },
+                    { name: "Others", percentage: 10, color: "#FFA000" },
+                  ].map((referrer) => (
+                    <div key={referrer.name} className="flex items-center">
+                      <div className="w-16 text-sm font-medium">
+                        {referrer.name}
+                      </div>
+                      <div className="flex-1">
+                        <div className="h-2 rounded-full bg-gray-200">
+                          <div
+                            className="h-2 rounded-full"
+                            style={{
+                              width: `${referrer.percentage}%`,
+                              backgroundColor: referrer.color,
+                            }}
+                          />
+                        </div>
+                      </div>
+                      <div className="w-12 text-right text-sm font-medium">
+                        {referrer.percentage}%
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="clicks" className="space-y-4">

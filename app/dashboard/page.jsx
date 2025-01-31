@@ -25,21 +25,23 @@ import { Skeleton } from "@/components/ui/skeleton";
 function Page() {
   const baseurl = process.env.NEXT_PUBLIC_BASE_URL;
   const [overviewData, setOverviewData] = useState(null);
+  const [topLinksData, setTopLinksData] = useState(null);
   const [isLoading, setloading] = useState(true);
   // const [error, seterror] = useState(null);
-  const fetchData = async () => {
+  async function fetchData() {
     try {
-      const response = await fetch(`${baseurl}/api/analytics`);
-      const data = await response.json();
-      // const data = {"success":true,"message":"data delivered","data":{"totalLink":5,"totalclick":[{"total_click":5,"total_use_link":2,"total_use_qr":3}],"mostClick":[{"shortUrl":"s.glaze.id/ex1","total":4},{"shortUrl":"s.glaze.id/ex2","total":2},{"shortUrl":"s.glaze.id/ex3","total":4}],"mostUserAgent":[{"userAgent":"Mozilla/5.0","total":4},{"userAgent":"\tChrome 131.0.0, Windows","total":1}],"mostReferrer":[{"referrer":"https://example.com","total":2},{"referrer":"https://google.com","total":1},{"referrer":"https://bing.com","total":1},{"referrer":"https://yahoo.com","total":1}]}}
-      console.log(data.data);
-      setOverviewData(data.data || []);
-    } catch (error) {
-      seterror(error);
+      const [overview, topLinks] = await Promise.all([
+        fetch(`${baseurl}/api/analytics/overview`).then((res) => res.json()),
+        fetch(`${baseurl}/api/analytics/top_links`).then((res) => res.json()),
+      ]);
+      setOverviewData(overview.data);
+      setTopLinksData(topLinks.data);
+    } catch (err) {
+      console.error("Failed to fetch data:", err);
     } finally {
       setloading(false);
     }
-  };
+  }
   useEffect(() => {
     fetchData();
   }, []);
@@ -69,10 +71,10 @@ function Page() {
         ) : (
           <>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <TotalLinksCard data={overviewData.totalLink} />
-              <TotalClicksCard data={overviewData.totalclick.total_click} />
-              <TotalQrCodesCard data={overviewData.totalclick.total_use_qr} />
-              <TopRefererCard data={overviewData.mostReferrer} />
+              <TotalLinksCard data={overviewData.total_use_link} />
+              <TotalClicksCard data={overviewData.total_click} />
+              <TotalQrCodesCard data={overviewData.total_use_qr} />
+              <TopRefererCard data={overviewData.top_referrer} />
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
@@ -81,7 +83,7 @@ function Page() {
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-              <TopPerformingLinksCard data={overviewData.mostClick} />
+              <TopPerformingLinksCard data={topLinksData} />
               <UsageStatisticsCard data={"lapar"} />
             </div>
           </>
@@ -95,7 +97,7 @@ function TotalLinksCard({ data }) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">Total Links</CardTitle>
+        <CardTitle className="text-sm font-[550]">Total Links</CardTitle>
         <LinkIcon className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
@@ -107,11 +109,10 @@ function TotalLinksCard({ data }) {
 }
 
 function TotalClicksCard({ data }) {
-  console.log(data);
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">Total Clicks</CardTitle>
+        <CardTitle className="text-sm font-[550]">Total Clicks</CardTitle>
         <MousePointerClick className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
@@ -126,7 +127,7 @@ function TotalQrCodesCard({ data }) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">Active QR Codes</CardTitle>
+        <CardTitle className="text-sm font-[550]">Active QR Codes</CardTitle>
         <QrCode className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
@@ -137,16 +138,18 @@ function TotalQrCodesCard({ data }) {
   );
 }
 
-function TopRefererCard() {
+function TopRefererCard({ data }) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">Top Referrers</CardTitle>
+        <CardTitle className="text-sm font-[550]">Top Referrers</CardTitle>
         <Globe2 className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">Twitter</div>
-        <p className="text-xs text-muted-foreground">30% of total traffic</p>
+        <div className="text-2xl font-bold">{data.url}</div>
+        <p className="text-xs text-muted-foreground">
+          {data.percentage}% of total traffic
+        </p>
       </CardContent>
     </Card>
   );
@@ -188,30 +191,28 @@ function RecentActivityCard() {
           <div className="flex items-center">
             <Globe className="mr-2 h-4 w-4 text-muted-foreground" />
             <div className="ml-4 space-y-1">
-              <p className="text-sm font-medium leading-none">
+              <p className="text-sm font-[550] leading-none">
                 New link created
               </p>
               <p className="text-sm text-muted-foreground">short.ly/abc123</p>
             </div>
-            <div className="ml-auto font-medium">Just now</div>
+            <div className="ml-auto font-[550]">Just now</div>
           </div>
           <div className="flex items-center">
             <MousePointerClick className="mr-2 h-4 w-4 text-muted-foreground" />
             <div className="ml-4 space-y-1">
-              <p className="text-sm font-medium leading-none">Link clicked</p>
+              <p className="text-sm font-[550] leading-none">Link clicked</p>
               <p className="text-sm text-muted-foreground">short.ly/xyz789</p>
             </div>
-            <div className="ml-auto font-medium">5m ago</div>
+            <div className="ml-auto font-[550]">5m ago</div>
           </div>
           <div className="flex items-center">
             <QrCode className="mr-2 h-4 w-4 text-muted-foreground" />
             <div className="ml-4 space-y-1">
-              <p className="text-sm font-medium leading-none">
-                QR Code scanned
-              </p>
+              <p className="text-sm font-[550] leading-none">QR Code scanned</p>
               <p className="text-sm text-muted-foreground">Product QR Code</p>
             </div>
-            <div className="ml-auto font-medium">1h ago</div>
+            <div className="ml-auto font-[550]">1h ago</div>
           </div>
         </div>
       </CardContent>
@@ -233,14 +234,14 @@ function TopPerformingLinksCard({ data }) {
               <div key={link.id} className="flex items-center">
                 <TrendingUp className="mr-2 h-4 w-4 text-muted-foreground" />
                 <div className="ml-4 space-y-1">
-                  <p className="text-sm font-medium leading-none">
-                    {link.shortUrl}
+                  <p className="text-sm font-[550] leading-none">
+                    {link.short_url}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {link.total} clicks
+                    {link.clicks} clicks
                   </p>
                 </div>
-                <div className="ml-auto font-medium">+5%</div>
+                <div className="ml-auto font-[550]">+5%</div>
               </div>
             ))}
         </div>
@@ -260,30 +261,30 @@ function UsageStatisticsCard() {
           <div className="flex items-center">
             <LinkIcon className="mr-2 h-4 w-4 text-muted-foreground" />
             <div className="ml-4 space-y-1">
-              <p className="text-sm font-medium leading-none">Links Created</p>
+              <p className="text-sm font-[550] leading-none">Links Created</p>
               <p className="text-sm text-muted-foreground">50 / 100</p>
             </div>
-            <div className="ml-auto font-medium">50%</div>
+            <div className="ml-auto font-[550]">50%</div>
           </div>
           <div className="flex items-center">
             <QrCode className="mr-2 h-4 w-4 text-muted-foreground" />
             <div className="ml-4 space-y-1">
-              <p className="text-sm font-medium leading-none">
+              <p className="text-sm font-[550] leading-none">
                 QR Codes Generated
               </p>
               <p className="text-sm text-muted-foreground">10 / 20</p>
             </div>
-            <div className="ml-auto font-medium">50%</div>
+            <div className="ml-auto font-[550]">50%</div>
           </div>
           <div className="flex items-center">
             <Clock className="mr-2 h-4 w-4 text-muted-foreground" />
             <div className="ml-4 space-y-1">
-              <p className="text-sm font-medium leading-none">
+              <p className="text-sm font-[550] leading-none">
                 Days Left in Billing Cycle
               </p>
               <p className="text-sm text-muted-foreground">15 days</p>
             </div>
-            <div className="ml-auto font-medium">50%</div>
+            <div className="ml-auto font-[550]">50%</div>
           </div>
         </div>
       </CardContent>
