@@ -16,7 +16,7 @@ export async function GET(request) {
   const links_data = await prisma.$queryRaw
   `
     SELECT 
-      (COUNT(clicks.id)) as total_click,
+      COUNT(clicks.id) as total_click,
       COUNT(IF(clicks.useqr=0,1,NULL)) as total_use_link,
       COUNT(IF(clicks.useqr=1,1,NULL)) as total_use_qr
     FROM Click clicks
@@ -24,7 +24,7 @@ export async function GET(request) {
     WHERE links.userId = ${sesssion.user.id}
   `.then((data) => data[0]);
 
-  const clicks_data = await prisma.$queryRaw
+  const top_ref_data = await prisma.$queryRaw
   `
     SELECT 
         clicks.referrer as top_referrer,
@@ -45,9 +45,9 @@ export async function GET(request) {
     WHERE links.userId = ${sesssion.user.id}
   `.then((data) => data[0]);
 
-  clicks_data.top_referrer = clicks_data.top_referrer.replace('https://','');
+  top_ref_data.top_referrer = top_ref_data.top_referrer.replace('https://','');
 
-  const percentage = Number(clicks_data.top_referrer_click) / Number(links_data.total_click ) * 100;
+  const percentage = Number(top_ref_data.top_referrer_click) / Number(links_data.total_click ) * 100;
 
   return NextResponse.json({
     success: true,
@@ -55,7 +55,7 @@ export async function GET(request) {
     data: {
       ...links_data,
       ...unique_user,
-      ...clicks_data,
+      ...top_ref_data,
       percentage
     },
   });
