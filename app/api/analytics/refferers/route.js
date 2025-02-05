@@ -6,7 +6,15 @@ import getKnex from "@/knex";
 
 export async function GET(request) {
   const session = await getServerSession(authOptions);
-  const searchParams = new URLSearchParams(request.url);
+  const { searchParams } = request.nextUrl;
+
+  if (!session || !session.user) {
+    return NextResponse.json(
+      { success: false, message: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
 
   const range1 = searchParams.has("range1")
     ? new moment(searchParams.get("range1")).format()
@@ -38,7 +46,9 @@ export async function GET(request) {
     .limit(limit);
 
   refferers_data.map((item) => {
-    item.pertencage = ((item.clicks / total_click.total_click) * 100).toFixed(2);
+    item.pertencage = ((item.clicks / total_click.total_click) * 100).toFixed(
+      2
+    );
     item.name = item.name.replace("https://", "");
   });
 

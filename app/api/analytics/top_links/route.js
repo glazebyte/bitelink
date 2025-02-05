@@ -7,7 +7,14 @@ import getKnex from "@/knex";
 export async function GET(request) {
   const base_url = process.env.SHORTLINK_BASE_URL;
   const session = await getServerSession(authOptions);
-  const searchParams = new URLSearchParams(request.url);
+  const { searchParams } = request.nextUrl;
+
+  if (!session || !session.user) {
+    return NextResponse.json(
+      { success: false, message: "Unauthorized" },
+      { status: 401 }
+    );
+  }
 
   const range1 = searchParams.has("range1")
     ? new moment(searchParams.get("range1")).format()
@@ -39,8 +46,8 @@ export async function GET(request) {
     .orderBy("clicks", "desc")
     .limit(limit);
   top_links.map((link) => {
-      link.short_url = `${base_url}/${link.short_url}`;
-  })
+    link.short_url = `${base_url}/${link.short_url}`;
+  });
   const data = top_links;
 
   return NextResponse.json({

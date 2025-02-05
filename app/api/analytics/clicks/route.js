@@ -6,7 +6,14 @@ import getKnex from "@/knex";
 
 export async function GET(request) {
   const session = await getServerSession(authOptions);
-  const searchParams = new URLSearchParams(request.url);
+  const { searchParams } = request.nextUrl;
+  
+  if (!session || !session.user) {
+    return NextResponse.json(
+      { success: false, message: "Unauthorized" },
+      { status: 401 }
+    );
+  }
 
   const range1 = searchParams.has("range1")
     ? new moment(searchParams.get("range1")).format()

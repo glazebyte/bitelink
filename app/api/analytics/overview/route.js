@@ -1,18 +1,18 @@
-import { PrismaClient } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { NextResponse } from "next/server";
 import getKnex from "@/knex";
 
-BigInt.prototype.toJSON = function () {
-  const int = Number.parseInt(this.toString());
-  return int ?? this.toString();
-};
-
-const prisma = new PrismaClient();
-
 export async function GET(request) {
   const session = await getServerSession(authOptions);
+  
+  if (!session || !session.user) {
+    return NextResponse.json(
+      { success: false, message: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
   const knex = getKnex();
 
   const links_data = await knex("Click")
@@ -47,8 +47,7 @@ export async function GET(request) {
 
   top_referrer.url = top_referrer.url.replace("https://", "");
 
-  const percentage =
-    (Number(top_referrer.clicks) / Number(links_data.total_click)) * 100;
+  const percentage = (top_referrer.clicks / links_data.total_click) * 100;
 
   return NextResponse.json({
     success: true,
